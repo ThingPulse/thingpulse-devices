@@ -20,6 +20,7 @@ Link to shop: https://thingpulse.com/product/epulse-feather-low-power-esp32-c6/
 * [Schematic](Schematic-ePulse-Feather-C6.pdf)
 * [3D Model (Step)](ePulseFeatherC6.step)
 * [Pin Out](ePulseFeatherC6-Pinout.pdf)
+* [Sample Projects on Github](https://github.com/ThingPulse/epulse-feather-c6-samples)
 
 ## Video
 
