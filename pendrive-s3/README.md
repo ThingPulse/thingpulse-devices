@@ -1,4 +1,4 @@
-# ePulse Feather C6
+# Pendrive S3
 
 ![ePulseFeatherC6](images/ThingPulse_PendriveS3_M.jpeg)
 
