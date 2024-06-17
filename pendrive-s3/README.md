@@ -32,12 +32,10 @@ Link to shop: https://thingpulse.com/product/esp32-s3-pendrive-s3-128mb/
 
 
 ## Documents
-
 * [Schematic](pendrive-s3-schematic.pdf)
 * [3D Model (Step)](pendrive-s3.step)
 
-## Software Projects
-
+## Software Projects
 * [Sample Projects on Github](https://github.com/ThingPulse/pendrive-s3-samples)
 * [SuperWiFiDuck](https://github.com/ThingPulse/SuperWifiDuck)
 
