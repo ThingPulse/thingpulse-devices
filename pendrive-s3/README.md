@@ -41,6 +41,11 @@ Link to shop: https://thingpulse.com/product/esp32-s3-pendrive-s3-128mb/
 
 ## Videos
 
-* [![Video](https://i3.ytimg.com/vi/QxjvsX2-O5E/hqdefault.jpg)](https://www.youtube.com/watch?v=QxjvsX2-O5E)
-* [![Video](https://i3.ytimg.com/vi/rwmssfPTCUo/hqdefault.jpg)](https://www.youtube.com/watch?v=rwmssfPTCUo)
-* [![Video](https://i3.ytimg.com/vi/ophLdG92JLo/hqdefault.jpg)](https://www.youtube.com/watch?v=ophLdG92JLo)
+### Components & Enclosure 
+[![Video](https://i3.ytimg.com/vi/QxjvsX2-O5E/hqdefault.jpg)](https://www.youtube.com/watch?v=QxjvsX2-O5E)
+
+### WiFi Dongle
+[![Video](https://i3.ytimg.com/vi/rwmssfPTCUo/hqdefault.jpg)](https://www.youtube.com/watch?v=rwmssfPTCUo)
+
+### Super WiFi Duck
+[![Video](https://i3.ytimg.com/vi/ophLdG92JLo/hqdefault.jpg)](https://www.youtube.com/watch?v=ophLdG92JLo)
