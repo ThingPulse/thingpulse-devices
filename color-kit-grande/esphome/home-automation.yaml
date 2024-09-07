@@ -1,0 +1,224 @@
+esphome:
+  name: esphome-web-c2e08c
+  friendly_name: ESPHome CKG Touch
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esphome-Web-C2E08C"
+    password: "ESPhome-Web-C2E08C"
+
+captive_portal:
+
+
+color:
+  - id: yellow
+    red: 100%
+    green: 100%
+    blue: 0%
+
+  - id: red
+    red: 100%
+    green: 0%
+    blue: 0%
+
+  - id: navy
+    red: 0%
+    green: 0%
+    blue: 50%
+
+i2c:
+  sda: 23
+  scl: 22
+  scan: true
+
+spi:
+  clk_pin: 5
+  mosi_pin: 18
+  miso_pin: 19
+
+output:
+  - platform: ledc
+    pin: 32
+    id: gpio_backlight_pwm
+
+
+
+display:
+  - platform: ili9xxx
+    id: CKG
+    model: ILI9488
+    rotation: 180
+    cs_pin: 15
+    dc_pin: 2
+    reset_pin: 4
+    auto_clear_enabled: false 
+    invert_colors: false
+    dimensions:
+      width: 480
+      height: 320
+      offset_height: 0
+      offset_width: 0
+
+
+touchscreen:
+  - platform: ft63x6
+    interrupt_pin: 27
+    display: CKG
+    id: touch
+    on_touch:
+      - logger.log:
+          format: Touch %d at (%d, %d)
+          args: [touch.id, touch.x, touch.y]
+
+sensor:
+  - platform: homeassistant
+    entity_id: sensor.th_sensor_8a0ab5_lywsd03mmc_mjwsd05mmc_atc_tempc
+    id: livingroom_temperature
+    on_value:
+      - lvgl.label.update:
+          id: temp_text
+          text:
+            format: "Living Room: %.1f"
+            args: [ 'x' ]  
+
+binary_sensor:
+  - platform: lvgl
+    widget: office_button
+    name: Office Button
+  - platform: lvgl
+    widget: dining_button
+    name: Dining table button
+  - platform: homeassistant
+    name: "Office Light"
+    id: ha_office_light
+    entity_id: switch.office
+    publish_initial_state: true
+    on_state:
+      then:
+        lvgl.widget.update:
+          id: office_button
+          state:
+            checked: !lambda return x;
+  - platform: homeassistant
+    name: "Dinging Table Light"
+    id: ha_dining_table_light
+    entity_id: light.dining_table
+    publish_initial_state: true
+    on_state:
+      then:
+        lvgl.widget.update:
+          id: dining_button
+          state:
+            checked: !lambda return x;
+
+
+
+# Define a monochromatic, dimmable light for the backlight
+light:
+  - platform: monochromatic
+    output: gpio_backlight_pwm
+    name: "Display Backlight"
+    id: back_light
+    restore_mode: ALWAYS_ON
+
+
+lvgl:
+  log_level: INFO
+  color_depth: 16
+  bg_color: 0x000000
+  border_width: 0
+  outline_width: 0
+  shadow_width: 0
+  text_font: unscii_16
+  align: center
+  theme:
+    button:
+      text_font: montserrat_24
+      scroll_on_focus: true
+      radius: 25
+      width: 150
+      height: 97
+      pad_left: 10px
+      pad_top: 10px
+      pad_bottom: 10px
+      pad_right: 10px
+      shadow_width: 0
+      border_width: 1
+      border_color: 0xFFFFFF
+      bg_color: 0x000000
+      text_color: 0xFFFFFF
+      checked:
+        bg_color: 0xFFFFFF
+        text_color: 0x000000
+  pages:
+    - id: main_page
+      widgets:
+        - label:
+            text_font: montserrat_14
+            text: "-.-°C"
+            id: temp_text
+            align: bottom_left
+            x: 10
+            y: -10
+            #text_align: right
+            text_color: 0xFFFFFF
+        - button: # Button
+            id: office_button
+            height: 100
+            width: 140
+            x: 10
+            y: 20
+            align: TOP_LEFT
+            checkable: true
+            widgets:
+            - label:
+                align: center
+                text: "Office"
+            on_short_click:
+              - homeassistant.service:
+                  service: switch.toggle
+                  data:
+                    entity_id: switch.office
+        - button: # Button
+            id: dining_button
+            height: 100
+            width: 140
+            x: 170
+            y: 20
+            align: TOP_LEFT
+            checkable: true
+            widgets:
+            - label:
+                align: center
+                text: "Dining"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: light.dining_table
+
+
+ 
+

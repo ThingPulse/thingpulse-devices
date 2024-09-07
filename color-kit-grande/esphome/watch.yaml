@@ -1,0 +1,236 @@
+esphome:
+  name: esphome-web-c2e08c
+  friendly_name: ESPHome CKG Touch
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esphome-Web-C2E08C"
+    password: "JuciUmZ6f9rL"
+
+captive_portal:
+
+
+color:
+  - id: yellow
+    red: 100%
+    green: 100%
+    blue: 0%
+
+  - id: red
+    red: 100%
+    green: 0%
+    blue: 0%
+
+  - id: navy
+    red: 0%
+    green: 0%
+    blue: 50%
+
+i2c:
+  sda: 23
+  scl: 22
+  scan: true
+
+spi:
+  clk_pin: 5
+  mosi_pin: 18
+  miso_pin: 19
+
+output:
+  - platform: ledc
+    pin: 32
+    id: gpio_backlight_pwm
+
+# Define a monochromatic, dimmable light for the backlight
+light:
+  - platform: monochromatic
+    output: gpio_backlight_pwm
+    name: "Display Backlight"
+    id: back_light
+    restore_mode: ALWAYS_ON
+
+display:
+  - platform: ili9xxx
+    id: CKG
+    model: ILI9488
+    rotation: 180
+    cs_pin: 15
+    dc_pin: 2
+    reset_pin: 4
+    auto_clear_enabled: false 
+    dimensions:
+      width: 480
+      height: 320
+      offset_height: 0
+      offset_width: 0
+
+
+touchscreen:
+  - platform: ft63x6
+    interrupt_pin: 38
+    display: CKG
+    id: touch
+    on_touch:
+      - logger.log:
+          format: Touch %d at (%d, %d)
+          args: [touch.id, touch.x, touch.y]
+
+time:
+  - platform: sntp
+    id: time_comp
+    timezone: Europe/Zurich
+    on_time_sync:
+      then:
+        - script.execute: time_update
+
+script:
+  - id: time_update
+    then:
+      - lvgl.indicator.update:
+          id: minute_hand
+          value: !lambda |-
+            return id(time_comp).now().minute;
+      - lvgl.indicator.update:
+          id: hour_hand
+          value: !lambda |-
+            auto now = id(time_comp).now();
+            return std::fmod(now.hour, 12) * 60 + now.minute;
+      - lvgl.label.update:
+          id: date_label
+          text: !lambda |-
+            static const char * const mon_names[] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+            static char date_buf[8];
+            auto now = id(time_comp).now();
+            snprintf(date_buf, sizeof(date_buf), "%s %2d", mon_names[now.month-1], now.day_of_month);
+            return date_buf;
+      - lvgl.label.update:
+          id: day_label
+          text: !lambda |-
+            static const char * const day_names[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+            return day_names[id(time_comp).now().day_of_week-1];
+
+interval:
+  - interval: 1min
+    then:
+      - script.execute: time_update
+
+lvgl:
+  log_level: INFO
+  color_depth: 16
+  bg_color: 0x0F0F0F
+  text_font: unscii_8
+  align: center
+  style_definitions:
+    - id: date_style
+      text_font: unscii_8
+      align: center
+      text_color: 0x000000
+      bg_opa: cover
+      radius: 4
+      pad_all: 2
+  widgets:
+    - obj: # Clock container
+        height: size_content
+        width: size_content
+        widgets:
+          - meter: # Gradient color  arc
+              height: 300
+              width: 300
+              align: center
+              bg_color: 0
+              scales:
+                angle_range: 360
+                rotation: 255
+                range_from: 0
+                range_to: 12
+                ticks:
+                  width: 35
+                  count: 13
+                  length: 8
+                indicators:
+                  - tick_style:
+                      local: true
+                      start_value: 0
+                      end_value: 12
+                      color_start: 0xFF0000
+                      color_end: 0x0000FF
+          - meter:
+              height: 300
+              width: 300
+              align: center
+                    
+              bg_opa: TRANSP
+              text_color: 0xFFFFFF
+              scales:
+                - ticks:
+                    width: 1
+                    count: 61
+                    length: 10
+                    color: 0xFFFFFF
+                  range_from: 0
+                  range_to: 60
+                  angle_range: 360
+                  rotation: 270
+                  indicators:
+                    - line:
+                        id: minute_hand
+                        width: 3
+                        color: 0xE0E0E0
+                        r_mod: -1
+
+                - 
+                  angle_range: 330
+                  rotation: 300
+                  range_from: 1
+                  range_to: 12
+                  ticks:
+                    width: 1
+                    count: 12
+                    length: 1
+                    major:
+                      stride: 1
+                      width: 4
+                      length: 8
+                      color: 0xC0C0C0
+                      label_gap: 6
+
+                - angle_range: 360
+                  rotation: 270
+                  range_from: 0
+                  range_to: 720
+                  indicators:
+                    - line:
+                        id: hour_hand
+                        width: 4
+                        color: 0xA0A0A0
+                        r_mod: -20
+          - label:
+              styles: date_style
+              id: day_label
+              y: -20
+          - label:
+              id: date_label
+              styles: date_style
+              y: +20
+
