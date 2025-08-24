@@ -12,7 +12,7 @@ logger:
 
 # ILI9xxx updated in ESPHome 2025.02 require activation of the PSRAM. Throws allocation error if not and goes into safe mode. https://github.com/esphome/esphome/pull/8084
 psram:
-  mode: octal
+  mode: quad
   speed: 80MHz
 
 # Enable Home Assistant API
