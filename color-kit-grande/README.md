@@ -22,6 +22,12 @@ This repository includes ESPHome configuration files to help you get started:
 - `esphome/watch.yaml` - Watch/display configuration
 - `esphome/secrets.yaml` - Configuration secrets (customize for your setup)
 
+## Hardware Resources
+
+### Schematics
+- [Connector Board Schematic](schematics/connector-board-color-kit-grande.pdf) - Color Kit Grande connector board
+- [ePulse Feather Schematic](../epulse-feather/schematic/epulse-feather-schematic.pdf) - Base ePulse Feather board
+
 ## Documentation
 
 For more information, tutorials, and support, visit [ThingPulse.com](https://thingpulse.com).
