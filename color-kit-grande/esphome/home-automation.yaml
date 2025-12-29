@@ -10,6 +10,11 @@ esp32:
 # Enable logging
 logger:
 
+# ILI9xxx updated in ESPHome 2025.02 require activation of the PSRAM. Throws allocation error if not and goes into safe mode. https://github.com/esphome/esphome/pull/8084
+psram:
+  mode: quad
+  speed: 80MHz
+
 # Enable Home Assistant API
 api:
   encryption:
@@ -63,21 +68,22 @@ output:
     pin: 32
     id: gpio_backlight_pwm
 
-
-
 display:
   - platform: ili9xxx
     id: CKG
-    model: ILI9488
-    rotation: 180
+    model: ILI9488_A
+    #rotation: 180
     cs_pin: 15
     dc_pin: 2
     reset_pin: 4
-    auto_clear_enabled: false 
+    auto_clear_enabled: false
     invert_colors: false
+    transform:
+      swap_xy: false
+      mirror_x: true
     dimensions:
-      width: 480
-      height: 320
+      width: 320
+      height: 480
       offset_height: 0
       offset_width: 0
 
